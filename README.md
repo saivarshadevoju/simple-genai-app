@@ -1,14 +1,16 @@
 # SimpleGenAIApp
 
-A beginner-friendly GenAI project that builds a Retrieval-Augmented Generation (RAG) flow using LangChain, OpenAI embeddings, and a FAISS vector database inside a Jupyter notebook.
+A beginner-friendly GenAI project with two implementations:
+1. **RAG Pipeline (Jupyter Notebook)**: Retrieval-Augmented Generation using LangChain, OpenAI embeddings, and FAISS vector database.
+2. **Streamlit App**: Interactive web UI for Q&A with local Ollama (TinyLLAMA) model.
 
 ## What you built in this project
 
-This project is implemented in `main.ipynb` and includes the full RAG flow:
-
+### 1. RAG Pipeline (`main.ipynb`)
+Complete notebook pipeline for retrieval-augmented generation:
 1. Load environment variables from `.env`.
 2. Ingest content from the LangSmith docs page using `WebBaseLoader`.
-3. Split the loaded text into chunks using `RecursiveCharacterTextSplitter`.
+3. Split loaded text into chunks using `RecursiveCharacterTextSplitter`.
 4. Create embeddings with `OpenAIEmbeddings`.
 5. Store vectors in a FAISS index.
 6. Run similarity search queries on the vector store.
@@ -17,32 +19,67 @@ This project is implemented in `main.ipynb` and includes the full RAG flow:
 9. Build a retrieval chain that combines retriever + document chain.
 10. Invoke the chain to get context-grounded answers.
 
+### 2. Streamlit App (`main_ollama.py`)
+Interactive web application using local Ollama model:
+- Streamlit framework for easy UI
+- Ollama TinyLLAMA model (runs locally, no API key needed)
+- LangChain prompt templates and output parsing
+- Real-time question answering
+
 ## Project files
 
-- `main.ipynb`: complete notebook pipeline (ingestion, chunking, embeddings, vector store, retrieval, QA chain).
+- `main.ipynb`: Complete RAG notebook pipeline (ingestion, chunking, embeddings, vector store, retrieval, QA chain).
+- `main_ollama.py`: Streamlit web app with local Ollama model.
 - `requirements.txt`: Python dependencies.
-- `.env`: API keys and environment configuration (local only, should not be committed).
+- `README.md`: Project documentation.
+- `.env`: API keys and environment configuration (local only, not committed).
+- `.gitignore`: Specifies files/folders to exclude from version control (.env, .venv, __pycache__, etc).
 
 ## Tech stack
 
-- Python
+- Python 3.11
 - Jupyter Notebook
-- LangChain ecosystem (`langchain`, `langchain_classic`, `langchain_core`, `langchain_community`, `langchain_openai`)
-- OpenAI API
-- FAISS (`faiss-cpu`)
-- BeautifulSoup (`beautifulsoup4`) for web page parsing
+- Streamlit (for web UI)
+- LangChain ecosystem:
+  - `langchain` (core framework)
+  - `langchain-classic` (chains and legacy APIs)
+  - `langchain-core` (interfaces)
+  - `langchain-community` (community integrations)
+  - `langchain-openai` (OpenAI integration)
+  - `langchain-text-splitters` (document chunking)
+- OpenAI API (for RAG notebook)
+- Ollama TinyLLAMA (for streamlit app, runs locally)
+- FAISS (`faiss-cpu`) (vector database)
+- BeautifulSoup (`beautifulsoup4`) (web scraping)
 
 ## Setup
 
-1. Create and activate your Python environment.
-2. Install dependencies:
+### Prerequisites
+- Python 3.10+ (tested on 3.11)
+- Ollama installed (for streamlit app): https://ollama.ai
 
+### Installation
+
+1. Clone the repository:
 ```bash
-pip install -r requirements.txt
+git clone https://github.com/saivarshadevoju/simple-genai-app.git
+cd SimpleGenAIApp
 ```
 
-3. Create a `.env` file with required keys:
+2. Create and activate virtual environment:
+```bash
+python -m venv .venv
+source .venv/bin/activate  # On macOS/Linux
+# or
+.venv\Scripts\activate     # On Windows
+```
 
+3. Install dependencies:
+```bash
+python -m pip install -r requirements.txt
+```
+
+4. Create a `.env` file with API keys (for RAG notebook only):
 ```env
 OPENAI_API_KEY=your_openai_key
 LANGCHAIN_API_KEY=your_langsmith_key
@@ -52,20 +89,48 @@ HF_TOKEN=your_huggingface_token
 
 ## Run
 
-1. Open `main.ipynb` in VS Code.
-2. Select the correct Python kernel.
-3. Run cells from top to bottom in order.
-4. Test retrieval queries and chain invocation cells.
+### Option 1: RAG Pipeline (Jupyter Notebook)
+```bash
+# Make sure .venv is activated
+source .venv/bin/activate
+
+# Open notebook
+jupyter notebook main.ipynb
+```
+
+Then:
+1. Select the correct Python kernel from `.venv`
+2. Run cells from top to bottom
+3. Test retrieval queries and chain invocation
+
+### Option 2: Streamlit Web App
+```bash
+# Make sure .venv is activated
+source .venv/bin/activate
+
+# Make sure Ollama is running locally
+# Then start the app
+streamlit run main_ollama.py
+```
+
+The app will open at `http://localhost:8501`
 
 ## Notes and learnings
 
-- For newer LangChain versions, some imports moved from `langchain.chains` to `langchain_classic.chains`.
-- Restarting the notebook kernel is important after changing `.env` values.
-- Better chunking improves retrieval quality; `RecursiveCharacterTextSplitter` worked better than basic character splitting for this page.
+- **Pydantic v2 compatibility**: Ollama model requires keyword argument: `Ollama(model="tinyllama")` not `Ollama("tinyllama")`
+- **LangChain imports**: For LangChain 1.x, chains APIs moved from `langchain.chains` to `langchain_classic.chains`
+- **Kernel refresh**: Restart notebook kernel after changing `.env` values
+- **Chunking quality**: `RecursiveCharacterTextSplitter` works better than basic character splitting for mixed-format content
+- **Virtual environment**: Always activate `.venv` before running pip or streamlit commands
+- **Shell issues**: Use `python -m pip` instead of direct `pip` to avoid PATH conflicts in zsh
 
 ## Next improvements
 
-- Add multiple documentation URLs as sources.
-- Add `k` and search type tuning in retriever settings.
-- Add citation-style output showing which chunk(s) were used.
-- Save and reload FAISS index locally for faster startup.
+- Add multiple documentation URLs as sources
+- Add `k` and search type tuning in retriever settings
+- Add citation output showing which chunks were used
+- Save/reload FAISS index locally for faster startup
+- Deploy streamlit app to Streamlit Cloud
+- Add custom styling and layout to streamlit app
+- Support for additional local models (Llama 2, Mistral, etc.)
+
